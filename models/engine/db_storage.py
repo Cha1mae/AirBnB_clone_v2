@@ -7,7 +7,20 @@ from models.base_model import Base
 
 
 def get_classes():
-    from models.__init__ import classes
+    global classes
+    if classes is None:
+        from models.base_model import BaseModel
+        from models.user import User
+        from models.place import Place
+        from models.state import State
+        from models.city import City
+        from models.amenity import Amenity
+        from models.review import Review
+        classes = {
+            'BaseModel': BaseModel, 'User': User, 'Place': Place,
+            'State': State, 'City': City, 'Amenity': Amenity,
+            'Review': Review
+        }
     return classes
 
 
@@ -30,19 +43,19 @@ class DBStorage:
     def all(self, cls=None):
         """Current database session"""
         from models import classes
-	    objects = {}
-            if cls:
-                query = self.__session.query(get_classes[cls])
+        objects = {}
+        if cls:
+            query = self.__session.query(get_classes()[cls])
+            for obj in query.all():
+                key = "{}.{}".format(cls, obj.id)
+                objects[key] = obj
+        else:
+            for clss in get_classes():
+                query = self.__session.query(get_classes()[clss])
                 for obj in query.all():
-                    key = "{}.{}".format(cls, obj.id)
+                    key = "{}.{}".format(clss, obj.id)
                     objects[key] = obj
-            else:
-                for clss in get_classes:
-                    query = self.__session.query(get_classes[clss])
-                    for obj in query.all():
-                        key = "{}.{}".format(clss, obj.id)
-                        objects[key] = obj
-            return objects
+        return objects
 
     def new(self, obj):
         """Add the object to database session"""
