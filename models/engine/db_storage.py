@@ -1,28 +1,9 @@
 #!/usr/bin/python3
-"""Module for DBStorage class"""
+"""Moduel fior DBStorage class"""
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from os import getenv
 from models.base_model import Base
-
-
-def get_classes():
-    global classes
-    if classes is None:
-        from models.base_model import BaseModel
-        from models.user import User
-        from models.place import Place
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
-        from models.review import Review
-        classes = {
-            'BaseModel': BaseModel, 'User': User, 'Place': Place,
-            'State': State, 'City': City, 'Amenity': Amenity,
-            'Review': Review
-        }
-    return classes
-
 
 class DBStorage:
     """Database storage engine"""
@@ -45,13 +26,13 @@ class DBStorage:
         from models import classes
         objects = {}
         if cls:
-            query = self.__session.query(get_classes()[cls])
+            query = self.__session.query(classes[cls])
             for obj in query.all():
                 key = "{}.{}".format(cls, obj.id)
                 objects[key] = obj
         else:
-            for clss in get_classes():
-                query = self.__session.query(get_classes()[clss])
+            for clss in classes:
+                query = self.__session.query(classes[clss])
                 for obj in query.all():
                     key = "{}.{}".format(clss, obj.id)
                     objects[key] = obj
