@@ -1,9 +1,15 @@
 #!/usr/bin/python3
-"""Moduel fior DBStorage class"""
+"""Module for DBStorage class"""
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from os import getenv
 from models.base_model import Base
+
+
+def get_classes():
+    from models.__init__ import classes
+    return classes
+
 
 class DBStorage:
     """Database storage engine"""
@@ -24,19 +30,19 @@ class DBStorage:
     def all(self, cls=None):
         """Current database session"""
         from models import classes
-        objects = {}
-        if cls:
-            query = self.__session.query(classes[cls])
-            for obj in query.all():
-                key = "{}.{}".format(cls, obj.id)
-                objects[key] = obj
-        else:
-            for clss in classes:
-                query = self.__session.query(classes[clss])
+	    objects = {}
+            if cls:
+                query = self.__session.query(get_classes[cls])
                 for obj in query.all():
-                    key = "{}.{}".format(clss, obj.id)
+                    key = "{}.{}".format(cls, obj.id)
                     objects[key] = obj
-        return objects
+            else:
+                for clss in get_classes:
+                    query = self.__session.query(get_classes[clss])
+                    for obj in query.all():
+                        key = "{}.{}".format(clss, obj.id)
+                        objects[key] = obj
+            return objects
 
     def new(self, obj):
         """Add the object to database session"""
@@ -58,4 +64,3 @@ class DBStorage:
             bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
-
