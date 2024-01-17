@@ -9,3 +9,9 @@ class State(BaseModel, Base):
     __tablename__ = 'states'
     name = Column(String(128), nullable=False)
     cities = relationship("City", backref="state", cascade="all, delete-orphan")
+
+    def to_dict(self):
+        """wa kanghwt wa 3yit"""
+        dict_representation = super().to_dict()
+        dict_representation['__class__'] = self.__class__.__name__
+        return dict_representation
