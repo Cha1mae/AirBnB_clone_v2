@@ -7,10 +7,10 @@ based on the first task
 
 from fabric.api import env, put, run
 from os.path import exists
-from datetime import datetime
-from 1-pack_web_static.py import do_pack
+from fabric.api import env, put, run
+from os.path import exists
 
-env.hosts = ['<52.91.152.110>', '<52.87.152.252>']
+env.hosts = ['52.91.152.110', '52.87.152.252']
 env.user = 'ubuntu'
 
 
@@ -28,20 +28,43 @@ def do_deploy(ap):
         return False
 
     try:
-        put(ap, "/tmp/")
-        archive_name = ap.split("/")[-1]
-        base_path = "/data/web_static/releases/"
-        archive_base = archive_name.split(".")[0]
-        release_path = base_path + archive_base
-        run("mkdir -p {}".format(release_path))
-        run("tar -xzf /tmp/{} -C {}".format(archive_name, release_path))
-        run("rm /tmp/{}".format(archive_name))
-        mv_command = "mv {}/web_static/* {}".format(
-            release_path, release_path
-        )
-        run(mv_command)
-        run("rm -rf /data/web_static/current")
-        run("ln -s {} /data/web_static/current".format(release_path))
+        file = ap.split("/")[-1]
+        name = file.split(".")[0]
+
+        # Uploading archive to /tmp/
+        if put(ap, "/tmp/{}".format(file)).failed:
+            return False
+
+        # Removing existing release directory
+        if run("rm -rf /data/web_static/releases/{}/".format(name)).failed:
+            return False
+
+        # Creating new release directory
+        if run("mkdir -p /data/web_static/releases/{}/".format(name)).failed:
+            return False
+
+        # Extracting archive to new release directory
+        if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/".format(file, name)).failed:
+            return False
+
+        # Cleaning up /tmp/
+        if run("rm /tmp/{}".format(file)).failed:
+            return False
+
+        # Moving contents to release directory
+        if run("mv /data/web_static/releases/{}/web_static/* /data/web_static/releases/{}/".format(name, name)).failed:
+            return False
+
+        # Cleaning up old web_static directory
+        if run("rm -rf /data/web_static/releases/{}/web_static".format(name)).failed:
+            return False
+
+        # Updating the symbolic link
+        if run("rm -rf /data/web_static/current").failed:
+            return False
+
+        if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".format(name)).failed:
+            return False
 
         print("New version deployed!")
         return True
