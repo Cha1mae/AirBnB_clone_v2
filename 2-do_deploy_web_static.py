@@ -10,7 +10,7 @@ from os.path import exists
 from datetime import datetime
 from 1-pack_web_static.py import do_pack
 
-env.hosts = ['<web-01 IP>', '<web-02 IP>']
+env.hosts = ['<52.91.152.110>', '<52.87.152.252>']
 env.user = 'ubuntu'
 
 
