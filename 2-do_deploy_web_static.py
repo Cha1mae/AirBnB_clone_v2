@@ -8,7 +8,7 @@ based on the first task
 from fabric.api import env, put, run
 from os.path import exists
 from datetime import datetime
-from 1-pack_web_static import do_pack
+from 1-pack_web_static.py import do_pack
 
 env.hosts = ['<web-01 IP>', '<web-02 IP>']
 env.user = 'ubuntu'
@@ -30,11 +30,15 @@ def do_deploy(ap):
     try:
         put(ap, "/tmp/")
         archive_name = ap.split("/")[-1]
-        release_path = "/data/web_static/releases/" + archive_name.split(".")[0]
+        base_path = "/data/web_static/releases/"
+        archive_base = archive_name.split(".")[0]
+        release_path = base_path + archive_base
         run("mkdir -p {}".format(release_path))
         run("tar -xzf /tmp/{} -C {}".format(archive_name, release_path))
         run("rm /tmp/{}".format(archive_name))
-        mv_command = "mv {}/web_static/* {}".format(release_path, release_path)
+        mv_command = "mv {}/web_static/* {}".format(
+            release_path, release_path
+        )
         run(mv_command)
         run("rm -rf /data/web_static/current")
         run("ln -s {} /data/web_static/current".format(release_path))
