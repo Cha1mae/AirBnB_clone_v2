@@ -34,7 +34,8 @@ def do_deploy(ap):
         run("mkdir -p {}".format(release_path))
         run("tar -xzf /tmp/{} -C {}".format(archive_name, release_path))
         run("rm /tmp/{}".format(archive_name))
-        run("mv {}/web_static/* {}".format(release_path, release_path))
+        mv_command = "mv {}/web_static/* {}".format(release_path, release_path)
+        run(mv_command)
         run("rm -rf /data/web_static/current")
         run("ln -s {} /data/web_static/current".format(release_path))
 
