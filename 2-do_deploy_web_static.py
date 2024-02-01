@@ -51,8 +51,8 @@ def do_deploy(archive_path):
             return False
 
         # Moving contents to release directory
-        if run("mv /data/web_static/releases/{}/web_static/* /data/web_static/releases/{}/"
-               .format(name, name)).failed:
+        if run("mv /data/web_static/releases/{}/web_static/* "
+	       "/data/web_static/releases/{}/".format(name, name)).failed:
             return False
 
         # Cleaning up old web_static directory
