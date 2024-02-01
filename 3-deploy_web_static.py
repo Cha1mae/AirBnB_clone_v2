@@ -5,11 +5,31 @@ Fabric script that distributes an archive to my webserver
 based on the first task
 """
 
-from fabric.api import env, put, run
+from fabric.api import env, run
 from os.path import exists
+from datetime import datetime
+from fabric.api import local, put
 
 env.hosts = ['52.91.152.110', '52.87.152.252']
 env.user = 'ubuntu'
+
+
+def do_pack():
+    """
+    Creates a tar archive of the web_static folder
+
+    Returns:
+        str: Path of the created archive, or None if unsuccessful
+    """
+    try:
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        archive_path = "versions/web_static_{}.tgz".format(timestamp)
+        local("mkdir -p versions")
+        local("tar -cvzf {} web_static".format(archive_path))
+        return archive_path
+    except Exception as e:
+        print(e)
+        return None
 
 
 def do_deploy(archive_path):
@@ -42,8 +62,7 @@ def do_deploy(archive_path):
             return False
 
         # Extracting archive to new release directory
-        if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/"
-               .format(file, name)).failed:
+        if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/".format(file, name)).failed:
             return False
 
         # Cleaning up /tmp/
@@ -51,21 +70,18 @@ def do_deploy(archive_path):
             return False
 
         # Moving contents to release directory
-        if run("mv /data/web_static/releases/{}/web_static/* /data/web_static/releases/{}/"
-               .format(name, name)).failed:
+        if run("mv /data/web_static/releases/{}/web_static/* /data/web_static/releases/{}/".format(name, name)).failed:
             return False
 
         # Cleaning up old web_static directory
-        if run("rm -rf /data/web_static/releases/{}/web_static"
-               .format(name)).failed:
+        if run("rm -rf /data/web_static/releases/{}/web_static".format(name)).failed:
             return False
 
         # Updating the symbolic link
         if run("rm -rf /data/web_static/current").failed:
             return False
 
-        if run("ln -s /data/web_static/releases/{}/ /data/web_static/current"
-               .format('test')).failed:
+        if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".format('test')).failed:
             return False
 
         print("New version deployed!")
@@ -80,3 +96,19 @@ if __name__ == "__main__":
     archive_path = do_pack()
     if archive_path:
         do_deploy(archive_path)
+
+
+def deploy():
+    """
+    Full deployment - creates and distributes an archive to web servers
+    """
+    archive_path = do_pack()
+    if archive_path is None:
+        return False
+
+    return do_deploy(archive_path)
+
+
+if __name__ == "__main__":
+    deploy()
+
