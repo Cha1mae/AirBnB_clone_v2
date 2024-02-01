@@ -1,14 +1,15 @@
-# Install Nginx package
+# puppet time 
+# Nginx package installing
 package { 'nginx':
   ensure   => 'installed',
   provider => 'apt',
 }
 
-# Create required directories
+# mkdir si lmodir
 file { '/data':
-  ensure  => 'directory',
-  owner   => 'ubuntu',
-  group   => 'ubuntu',
+  ensure => 'directory',
+  owner  => 'ubuntu',
+  group  => 'ubuntu',
 }
 
 file { '/data/web_static':
@@ -35,7 +36,7 @@ file { '/data/web_static/releases/test':
   group  => 'ubuntu',
 }
 
-# Create a fake HTML file
+# the fake html file
 file { '/data/web_static/releases/test/index.html':
   ensure  => 'present',
   content => '<html><head></head><body>Holberton School Puppet</body></html>',
@@ -43,27 +44,27 @@ file { '/data/web_static/releases/test/index.html':
   group   => 'ubuntu',
 }
 
-# Create a symbolic link
+# the links 
 file { '/data/web_static/current':
   ensure => 'link',
-  target => '/data/web_static/releases/test/index.html',
+  target => '/data/web_static/releases/test/',
   force  => true,
   owner  => 'ubuntu',
   group  => 'ubuntu',
 }
 
-# Change ownership of /data/ recursively
+# this will change the ownership
 exec { 'chown -R ubuntu:ubuntu /data/':
   path => '/usr/bin/:/usr/local/bin/:/bin/',
 }
 
-# Update Nginx configuration
+# Nginx update
 file { '/etc/nginx/sites-available/default':
   content => template('/etc/nginx/nginx.conf'),
   notify  => Service['nginx'],
 }
 
-# Ensure Nginx service is running
+# Nginx is running
 service { 'nginx':
   ensure  => 'running',
   enable  => true,
