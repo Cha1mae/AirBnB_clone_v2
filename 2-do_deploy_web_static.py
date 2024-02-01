@@ -14,25 +14,25 @@ env.hosts = ['52.91.152.110', '52.87.152.252']
 env.user = 'ubuntu'
 
 
-def do_deploy(ap):
+def do_deploy(archive_path):
     """
     Distributes an archive to my WS (web server)
 
     Args:
-        ap (str): Path to the archive
+        archive_path (str): Path to the archive
 
     Returns:
         bool: True if all good or otherwise False
     """
-    if not exists(ap):
+    if not exists(archive_path):
         return False
 
     try:
-        file = ap.split("/")[-1]
+        file = archive_path.split("/")[-1]
         name = file.split(".")[0]
 
         # Uploading archive to /tmp/
-        if put(ap, "/tmp/{}".format(file)).failed:
+        if put(archive_path, "/tmp/{}".format(file)).failed:
             return False
 
         # Removing existing release directory
@@ -75,6 +75,6 @@ def do_deploy(ap):
 
 
 if __name__ == "__main__":
-    ap = do_pack()
-    if ap:
-        do_deploy(ap)
+    archive_path = do_pack()
+    if archive_path:
+        do_deploy(archive_path)
