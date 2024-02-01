@@ -7,8 +7,6 @@ based on the first task
 
 from fabric.api import env, put, run
 from os.path import exists
-from fabric.api import env, put, run
-from os.path import exists
 
 env.hosts = ['52.91.152.110', '52.87.152.252']
 env.user = 'ubuntu'
@@ -63,7 +61,7 @@ def do_deploy(archive_path):
         if run("rm -rf /data/web_static/current").failed:
             return False
 
-        if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".format(name)).failed:
+        if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".format('test')).failed:
             return False
 
         print("New version deployed!")
