@@ -2,7 +2,7 @@
 
 """
 Fabric script that distributes an archive to my webserver
-based on the first task
+based on the first task and the second
 """
 
 from fabric.api import env, run
@@ -62,7 +62,8 @@ def do_deploy(archive_path):
             return False
 
         # Extracting archive to new release directory
-        if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/".format(file, name)).failed:
+        if run("tar -xzf /tmp/{} -C /data/web_static/releases/{}/"
+               .format(file, name)).failed:
             return False
 
         # Cleaning up /tmp/
@@ -70,18 +71,21 @@ def do_deploy(archive_path):
             return False
 
         # Moving contents to release directory
-        if run("mv /data/web_static/releases/{}/web_static/* /data/web_static/releases/{}/".format(name, name)).failed:
+        if run("mv /data/web_static/releases/{}/web_static/* "
+               "/data/web_static/releases/{}/".format(name, name)).failed:
             return False
 
         # Cleaning up old web_static directory
-        if run("rm -rf /data/web_static/releases/{}/web_static".format(name)).failed:
+        if run("rm -rf /data/web_static/releases/{}/web_static"
+               .format(name)).failed:
             return False
 
         # Updating the symbolic link
         if run("rm -rf /data/web_static/current").failed:
             return False
 
-        if run("ln -s /data/web_static/releases/{}/ /data/web_static/current".format('test')).failed:
+        if run("ln -s /data/web_static/releases/{}/ /data/web_static/current"
+               .format('test')).failed:
             return False
 
         print("New version deployed!")
@@ -92,23 +96,18 @@ def do_deploy(archive_path):
         return False
 
 
-if __name__ == "__main__":
-    archive_path = do_pack()
-    if archive_path:
-        do_deploy(archive_path)
-
-
 def deploy():
     """
-    Full deployment - creates and distributes an archive to web servers
+    Creates and distributes an archive to my WS (web server)
+
+    Returns:
+        bool: True if all operations were successful, or False otherwise
     """
     archive_path = do_pack()
     if archive_path is None:
         return False
-
     return do_deploy(archive_path)
 
 
 if __name__ == "__main__":
     deploy()
-
