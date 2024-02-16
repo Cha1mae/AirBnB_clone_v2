@@ -4,7 +4,7 @@ starts a Flask web application, hello hbnb, hbnb,
 c is fun, python is fun, number, html num
 """
 
-from flask import Flask
+from flask import Flask, render_template
 app = Flask(__name__)
 
 
@@ -45,6 +45,7 @@ def NT(n):
     """ display html !! only !! if n is intg"""
     n = str(n)
     return render_template('5-number.html', n=n)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='5000')
