@@ -1,10 +1,10 @@
 #!/usr/bin/python3
-""" State Module for HBNB project """
-from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String
-from sqlalchemy.orm import relationship
+"""This is the state class"""
 import os
 import models
+from models.base_model import BaseModel, Base
+from sqlalchemy import Column, String, Integer
+from sqlalchemy.orm import relationship
 
 
 class State(BaseModel, Base):
@@ -19,7 +19,7 @@ class State(BaseModel, Base):
     else:
         @property
         def cities(self):
-            """returns list of Cities and some relationships"""
+            """Returns list of City objects linked to the current State"""
             cities_instances = []
             cities_dict = models.storage.all(models.City)
             for key, value in cities_dict.items():
