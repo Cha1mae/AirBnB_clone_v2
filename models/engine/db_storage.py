@@ -1,10 +1,9 @@
 #!/usr/bin/python3
-"""Module for DBStorage class"""
+"""Moduel fior DBStorage class"""
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from os import getenv
 from models.base_model import Base
-from models import Amenity, BaseModel, City, Place, Review, State, User
 
 class DBStorage:
     """Database storage engine"""
@@ -23,19 +22,19 @@ class DBStorage:
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        """Query objects from database session"""
+        """Current database session"""
+        from models import classes
         objects = {}
         if cls:
-            query = self.__session.query(cls)
+            query = self.__session.query(classes[cls])
             for obj in query.all():
-                key = "{}.{}".format(cls.__name__, obj.id)
+                key = "{}.{}".format(cls, obj.id)
                 objects[key] = obj
         else:
-            all_classes = [Amenity, BaseModel, City, Place, Review, State, User]
-            for cls in all_classes:
-                query = self.__session.query(cls)
+            for clss in classes:
+                query = self.__session.query(classes[clss])
                 for obj in query.all():
-                    key = "{}.{}".format(cls.__name__, obj.id)
+                    key = "{}.{}".format(clss, obj.id)
                     objects[key] = obj
         return objects
 
@@ -59,7 +58,3 @@ class DBStorage:
             bind=self.__engine, expire_on_commit=False)
         Session = scoped_session(session_factory)
         self.__session = Session()
-
-    def close(self):
-        """Close the current session"""
-        self.__session.close()
