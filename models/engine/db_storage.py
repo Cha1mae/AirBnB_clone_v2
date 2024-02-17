@@ -1,9 +1,16 @@
 #!/usr/bin/python3
-"""Moduel fior DBStorage class"""
+"""Module for DBStorage class"""
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from os import getenv
 from models.base_model import Base
+from models.user import User
+from models.state import State
+from models.city import City
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
 
 
 class DBStorage:
@@ -24,18 +31,18 @@ class DBStorage:
 
     def all(self, cls=None):
         """Current database session"""
-        from models import classes
+        classes = [User, State, City, Amenity, Place, Review]
         objects = {}
         if cls:
-            query = self.__session.query(classes[cls])
+            query = self.__session.query(cls)
             for obj in query.all():
-                key = "{}.{}".format(cls, obj.id)
+                key = "{}.{}".format(cls.__name__, obj.id)
                 objects[key] = obj
         else:
-            for clss in classes:
-                query = self.__session.query(classes[clss])
+            for cls in classes:
+                query = self.__session.query(cls)
                 for obj in query.all():
-                    key = "{}.{}".format(clss, obj.id)
+                    key = "{}.{}".format(cls.__name__, obj.id)
                     objects[key] = obj
         return objects
 
